@@ -1,7 +1,8 @@
 ---
 title: "Two Correct Prices, Two Wrong Products: Building ShelfProof"
-published: false
+published: true
 tags: devchallenge, hf26challenge, opensource, ai
+canonical_url: https://dev.to/blucca/two-correct-prices-two-wrong-products-building-shelfproof-15o8
 cover_image: https://blucca.github.io/shelfproof/assets/cover.png
 ---
 

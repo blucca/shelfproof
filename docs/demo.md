@@ -10,6 +10,8 @@ The result is three price differences, three matching readings and one item mark
 
 This recording uses fictional artwork with seeded errors. Review actions were performed by a script. The English narration is synthesized with Amazon Polly. Actual clips and screenshots follow the captured workflow; reading pauses and source-detail close-ups make the evidence readable.
 
+The film completed a full-speed browser playback with all 19 caption cues. The public player also passed chapter seeking, mobile layout and sample-report checks. Chapter navigation uses HTTP byte-range requests, supported by the published GitHub Pages player.
+
 ## Chapters
 
 | Start | Step |

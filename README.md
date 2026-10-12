@@ -6,7 +6,7 @@ ShelfProof is a local-browser price-proofing desk for small design and print stu
 
 **[Try ShelfProof](https://blucca.github.io/shelfproof/)** · [Watch the workflow](https://blucca.github.io/shelfproof/demo/) · [Sample correction sheet](https://blucca.github.io/shelfproof/demo/sample-review.html) · [Release checks](docs/validation.md)
 
-Built for [MLH × DEV's Side Hustle challenge](https://dev.to/challenges/hacktoberfest-week2-2026-10-12), October 12–18, 2026. Development began October 12 at 19:36 UTC, inside the contest window.
+[Read the submitted build story](https://dev.to/blucca/two-correct-prices-two-wrong-products-building-shelfproof-15o8). Built for [MLH × DEV's Side Hustle challenge](https://dev.to/challenges/hacktoberfest-week2-2026-10-12), October 12–18, 2026. Development began October 12 at 19:36 UTC, inside the contest window.
 
 ## First release
 
