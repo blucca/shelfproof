@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#DDEAF2">
+  <title>ShelfProof — Check the price on the page</title>
+  <meta name="description" content="A local price-proofing desk. Compare final artwork with an approved SKU price list, review the exact regions, and send a clear correction sheet.">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./vendor/tesseract/tesseract.min.js" defer></script>
+  <script src="./app.mjs" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the proofing desk</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="ShelfProof home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 7h22v18H5z"/><path d="m11 16 4 4 8-10"/></svg>ShelfProof</a>
+    <nav aria-label="Main"><a href="#how-it-works">How it works</a><a href="https://github.com/blucca/shelfproof">Source</a></nav>
+  </header>
+  <main id="main">
+    <section class="intro" id="intro" aria-labelledby="headline">
+      <div class="intro-copy">
+        <h1 id="headline">Check the price<br>on the page.</h1>
+        <p class="lead">The artwork looks right.<br>Are the prices on the right products?</p>
+        <p>Compare your final proof with an approved price list. Check each SKU against the actual printed pixels, then send a clear correction sheet.</p>
+        <div class="intro-actions"><button class="primary" id="try-sample">Try the sample proof</button><button class="secondary" id="use-files">Use my files</button></div>
+        <p class="local-note"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="10" rx="1"/><path d="M7 17h6m-3-3v3"/></svg>Open-source OCR, on your device. Your files stay here.</p>
+      </div>
+      <figure class="hero-proof">
+        <div class="hero-sheet"><img src="./assets/sample-promo.png" alt="Fictional Sunday Shelf artwork with a notebook priced at $12 and a pouch priced at $8.50." width="1400" height="1800"><span class="proof-circle" aria-hidden="true"></span></div>
+        <figcaption class="hero-note"><span class="note-sku">SP-101 / Dot Notebook</span><span>Approved <strong>$8.50</strong></span><span>On the page <strong class="red">$12.00</strong></span><small>A fictional proof with planted price errors.</small></figcaption>
+      </figure>
+    </section>
+
+    <section class="desk" id="desk" hidden aria-labelledby="desk-title">
+      <div class="desk-heading"><div><h1 id="desk-title">Your proofing desk</h1><p id="source-caption">Add the final artwork and its approved price list.</p></div><button class="text-button" id="start-over">Start another proof</button></div>
+      <form id="proof-form" class="input-strip">
+        <label class="file-field"><span>Artwork</span><input id="artwork-file" type="file" accept="application/pdf,image/png,image/jpeg"><small>PDF, PNG or JPEG · up to 5 pages</small></label>
+        <label class="file-field"><span>Approved price list</span><input id="catalog-file" type="file" accept=".csv,text/csv"><small><a href="./assets/sample-prices.csv" download>CSV example</a> · sku, name, price · up to 50 SKUs</small></label>
+        <label class="currency-field"><span>Currency</span><select id="currency"><option value="$">$ Dollar</option><option value="£">£ Pound</option><option value="€">€ Euro</option></select></label>
+        <button class="primary" id="read-proof" type="submit">Read artwork</button>
+      </form>
+      <p class="format-note">Use visible SKU labels and one intended price per SKU. The CSV price column uses a decimal point, such as 24.50. Each proof uses one currency.</p>
+      <div class="progress-wrap" id="progress-wrap" hidden><progress id="progress" max="1" value="0" aria-label="Reading progress"></progress><p id="progress-message"></p></div>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <div id="results" hidden>
+        <div class="results-heading"><div><h2 id="summary">Your review</h2><p id="review-count"></p></div><div class="export-actions"><button class="secondary" id="copy-issues">Copy issue list</button><button class="primary" id="export-review">Download review</button></div></div>
+        <div class="proof-workspace">
+          <section class="artwork-pane" aria-label="Artwork and evidence regions">
+            <div class="page-toolbar"><label>Page <select id="page-picker" aria-label="Artwork page"></select></label><span><i class="legend-sku"></i>SKU <i class="legend-price"></i>Price</span><button id="pick-region" class="small-button" type="button">Choose a price area</button></div>
+            <p class="region-hint" id="region-hint" hidden>Drag a box around this SKU’s printed price. On a touch screen, drag with one finger.</p>
+            <div class="proof-stage" id="proof-stage"><img id="proof-image" alt="The current page of your artwork" draggable="false"><svg id="proof-overlay" aria-label="Selected source regions"></svg></div>
+            <p class="page-note">Blue marks the SKU. Red marks the associated price. Check the pairing as well as the number.</p>
+          </section>
+          <aside class="review-pane" aria-label="SKU checklist and selected reading">
+            <div class="list-heading"><h3>Every expected SKU</h3><span>Approved / read</span></div>
+            <div id="sku-list" class="sku-list" aria-label="Select a SKU to review"></div>
+            <section class="reading-panel" id="reading-panel" aria-labelledby="reading-title">
+              <h3 id="reading-title"></h3><p class="reading-reason" id="reading-reason"></p>
+              <div class="evidence-pair"><figure><figcaption>SKU region</figcaption><img id="sku-crop" alt="The SKU as read from the artwork" hidden><span id="sku-crop-empty">Locate the SKU on the page.</span></figure><figure><figcaption>Price region</figcaption><img id="price-crop" alt="The price as read from the artwork" hidden><span id="price-crop-empty">Choose its price area.</span></figure></div>
+              <p class="original-read" id="original-read"></p>
+              <form id="confirm-form"><label for="observed-price">Price on the page</label><div class="confirm-line"><span id="input-currency">$</span><input id="observed-price" inputmode="decimal" autocomplete="off" placeholder="24.50" aria-describedby="confirm-help"><button class="primary" type="submit">Confirm reading</button></div><p id="confirm-help">Confirm the SKU-to-price pairing. Correct the reading here when the print says something else.</p></form>
+              <button class="text-button missing-button" id="mark-missing" type="button">Mark SKU missing from artwork</button>
+            </section>
+          </aside>
+        </div>
+        <p class="session-note">Your files and readings stay in this tab. Download the review to keep the full checklist and selected source crops.</p>
+      </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works" aria-labelledby="how-title"><h2 id="how-title">A price is only right<br>beside the right SKU.</h2><ol><li><strong>Read the final page.</strong><p>Tesseract’s open LSTM model reads the rendered artwork, including image-only PDFs.</p></li><li><strong>Review the pairing.</strong><p>See each expected SKU, its approved price, and the corresponding regions on the page. Resolve unclear readings yourself.</p></li><li><strong>Hand back a clear proof.</strong><p>Export the checklist, source crops and your decisions as a self-contained review. Print it to PDF or send the issue list.</p></li></ol></section>
+    <section class="service" id="review-service" aria-labelledby="service-title"><div><h2 id="service-title">Have a proof packet<br>you’d like us to check?</h2><p>A focused review from Blucca’s AI-operated studio: your approved list, up to five pages and fifty SKUs, one issue sheet and one clarification round.</p></div><div class="service-offer"><p class="price">$29<span> per packet</span></p><a class="primary button-link" href="mailto:belgialucca@gmail.com?subject=ShelfProof%20%2429%20price-proof%20review&amp;body=I%20have%20a%20price-proof%20packet.%0APages%3A%0ASKUs%3A%0ANeeded%20by%3A%0AI%20can%20share%20a%20redacted%20sample%20for%20scope%20confirmation.">Ask about a review</a><p>Share a redacted page first. We agree scope and a delivery date before an order.</p></div></section>
+  </main>
+  <footer><a class="brand" href="./">ShelfProof</a><p>Built with Codex. Open code, local OCR, visible evidence.</p><a href="https://github.com/blucca/shelfproof/blob/main/LICENSES.md">Licenses &amp; sources</a></footer>
+</body>
+</html>
