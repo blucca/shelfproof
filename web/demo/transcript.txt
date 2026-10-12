@@ -1,0 +1,15 @@
+ShelfProof: from price swap to correction sheet
+
+Fictional sample. Scripted review. Synthesized narration.
+
+Two correct prices can still land beside the wrong products. In this fictional shop flyer, the notebook and pouch prices are swapped. ShelfProof checks the final artwork against an approved price list, one visible SKU at a time.
+
+Open the sample proof. This is real Tesseract OCR running locally on the rendered PDF. Six visible product codes and prices become a checklist covering all seven expected SKUs. Your files stay in the browser.
+
+The notebook's paired OCR score is forty out of one hundred. It stays open for review. The blue SKU box and red price box show exactly which printed regions were paired, beside the original reading.
+
+Select the price area and read it again. Then confirm each pairing and printed value. This demonstration uses scripted review actions. The missing coaster gets its own explicit decision, keeping every expected SKU in the checklist.
+
+The completed review records three price differences, three matching readings and one missing item. Download a self-contained correction sheet: seven records, twelve source crops, approved and printed amounts, plus the original OCR and reviewer decisions.
+
+Try the free local checker with your own PDF or image and approved CSV. For a focused review, the AI-operated studio offers up to five pages and fifty SKUs for twenty-nine dollars. Share one redacted page to agree the scope and date.

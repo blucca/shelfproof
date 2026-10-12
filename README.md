@@ -4,7 +4,7 @@ Check the price on the page.
 
 ShelfProof is a local-browser price-proofing desk for small design and print studios. It reads the rendered artwork with open-source OCR, pairs visible SKUs with prices, and compares them with an approved CSV. Every expected SKU gets a review row. A correction sheet carries the source regions and the reviewer's decisions back to the client.
 
-**[Try ShelfProof](https://blucca.github.io/shelfproof/)** · [Release checks](docs/validation.md)
+**[Try ShelfProof](https://blucca.github.io/shelfproof/)** · [Watch the workflow](https://blucca.github.io/shelfproof/demo/) · [Sample correction sheet](https://blucca.github.io/shelfproof/demo/sample-review.html) · [Release checks](docs/validation.md)
 
 Built for [MLH × DEV's Side Hustle challenge](https://dev.to/challenges/hacktoberfest-week2-2026-10-12), October 12–18, 2026. Development began October 12 at 19:36 UTC, inside the contest window.
 

@@ -1,0 +1,58 @@
+WEBVTT
+
+00:00:00.350 --> 00:00:03.997
+Two correct prices can still land beside the wrong products.
+
+00:00:04.017 --> 00:00:08.477
+In this fictional shop flyer, the notebook and pouch prices are swapped.
+
+00:00:08.497 --> 00:00:14.390
+ShelfProof checks the final artwork against an approved price list, one visible SKU at a time.
+
+00:00:15.390 --> 00:00:17.212
+Open the sample proof.
+
+00:00:17.232 --> 00:00:21.630
+This is real Tesseract OCR running locally on the rendered PDF.
+
+00:00:21.650 --> 00:00:27.547
+Six visible product codes and prices become a checklist covering all seven expected SKUs.
+
+00:00:27.567 --> 00:00:29.358
+Your files stay in the browser.
+
+00:00:30.358 --> 00:00:34.130
+The notebook's paired OCR score is forty out of one hundred.
+
+00:00:34.150 --> 00:00:36.273
+It stays open for review.
+
+00:00:36.293 --> 00:00:42.814
+The blue SKU box and red price box show exactly which printed regions were paired, beside the original reading.
+
+00:00:43.814 --> 00:00:46.574
+Select the price area and read it again.
+
+00:00:46.594 --> 00:00:49.554
+Then confirm each pairing and printed value.
+
+00:00:49.574 --> 00:00:52.909
+This demonstration uses scripted review actions.
+
+00:00:52.929 --> 00:00:58.598
+The missing coaster gets its own explicit decision, keeping every expected SKU in the checklist.
+
+00:00:59.614 --> 00:01:05.336
+The completed review records three price differences, three matching readings and one missing item.
+
+00:01:05.356 --> 00:01:14.734
+Download a self-contained correction sheet: seven records, twelve source crops, approved and printed amounts, plus the original OCR and reviewer decisions.
+
+00:01:15.734 --> 00:01:20.569
+Try the free local checker with your own PDF or image and approved CSV.
+
+00:01:20.589 --> 00:01:27.899
+For a focused review, the AI-operated studio offers up to five pages and fifty SKUs for twenty-nine dollars.
+
+00:01:27.919 --> 00:01:30.950
+Share one redacted page to agree the scope and date.

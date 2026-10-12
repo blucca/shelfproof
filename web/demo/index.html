@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#DDEAF2">
+<title>ShelfProof demo — From price swap to correction sheet</title>
+<meta name="description" content="Watch a real 93-second ShelfProof run: local OCR, SKU–price source evidence, review decisions and the exported correction sheet.">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:Barlow;src:url('../vendor/fonts/Barlow-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:Barlow;src:url('../vendor/fonts/Barlow-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
+@font-face{font-family:'Barlow Condensed';src:url('../vendor/fonts/BarlowCondensed-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:#ddeaf2;color:#16324f;font:18px/1.55 Barlow,sans-serif}a{color:#185adb;text-underline-offset:.18em}a:hover{text-decoration-thickness:2px}a:focus-visible,button:focus-visible,video:focus-visible,summary:focus-visible{outline:3px solid #185adb;outline-offset:5px}.skip{position:absolute;left:20px;top:-100px;padding:10px;background:white}.skip:focus{top:12px;z-index:3}.site-header{max-width:1320px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:22px 30px;gap:20px}.brand{display:inline-flex;align-items:center;gap:10px;color:#16324f;text-decoration:none;font:600 34px/1 'Barlow Condensed',sans-serif}.brand img{width:28px;height:28px}.site-header nav{display:flex;gap:24px;font-size:16px}.site-header nav a{color:#16324f}main{max-width:1320px;margin:0 auto;padding:28px 30px 64px}.intro{display:grid;grid-template-columns:1.15fr 1fr;gap:54px;align-items:end;margin:8px 0 32px}h1,h2,h3{line-height:1.06;margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:600}h1{font-size:clamp(42px,5.5vw,74px);max-width:15ch}h2{font-size:38px}h3{font-size:27px}p{max-width:70ch}.intro p{margin:0;font-size:20px;max-width:48ch}.film{margin:0}video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#16324f;border:1px solid #abc3d5}.film figcaption{font-size:15px;line-height:1.55;margin-top:12px;color:#49667b}.chapters{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin:25px 0 34px;border-top:1px solid #abc3d5;border-bottom:1px solid #abc3d5}.chapters button{font:600 16px/1.3 Barlow,sans-serif;text-align:left;background:transparent;border:0;padding:16px 14px;color:#16324f;cursor:pointer;min-height:79px}.chapters button:hover{background:#cbdfe9}.chapters span{display:block;color:#185adb;font-size:14px;margin-bottom:5px;font-variant-numeric:tabular-nums}.delivery{background:white;display:grid;grid-template-columns:1.2fr 1fr;gap:44px;padding:30px 34px;border-left:5px solid #185adb}.delivery p{margin:15px 0}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.button{display:inline-flex;align-items:center;padding:12px 19px;border:1px solid #16324f;border-radius:4px;background:#16324f;color:white;font-weight:600;text-decoration:none}.button.secondary{background:transparent;color:#16324f;border-color:#94afc1}.service .price{font:600 52px/1 'Barlow Condensed',sans-serif}.service p{font-size:17px}.service h2{font-size:31px}.download-links{display:flex;flex-wrap:wrap;gap:20px;font-size:16px;margin:25px 0}details{border-top:1px solid #abc3d5;margin-top:34px;padding-top:20px}summary{font:600 30px/1.3 'Barlow Condensed',sans-serif;cursor:pointer}details h3{margin-top:27px}details p{margin:10px 0 22px}footer{max-width:1320px;margin:0 auto;padding:20px 30px 30px;display:flex;justify-content:space-between;gap:20px;color:#49667b;font-size:15px}footer a{color:inherit}
+@media(max-width:800px){.intro{grid-template-columns:1fr;gap:22px}.chapters{grid-template-columns:repeat(3,1fr)}.delivery{grid-template-columns:1fr;gap:30px}.site-header,main,footer{padding-left:20px;padding-right:20px}.site-header nav{gap:16px}.intro p{font-size:18px}.delivery{padding:23px}.service{border-top:1px solid #abc3d5;padding-top:25px}}
+@media(max-width:430px){.site-header{align-items:flex-start}.site-header nav{flex-direction:column;gap:4px;text-align:right;font-size:14px}.brand{font-size:30px}.chapters button{padding:13px 8px;font-size:14px}.chapters span{font-size:13px}footer{flex-direction:column;gap:6px}.actions{align-items:stretch}.button{justify-content:center}}
+</style>
+</head>
+<body>
+<a class="skip" href="#demo">Skip to the demo</a>
+<header class="site-header"><a class="brand" href="../"><img src="../assets/icon.svg" alt="">ShelfProof</a><nav aria-label="Main"><a href="../">Try the checker</a><a href="https://github.com/blucca/shelfproof">Source</a></nav></header>
+<main id="demo">
+<section class="intro"><h1>Two prices. Swapped.</h1><p>A notebook gets the pouch’s price. Follow the printed pixels through local OCR, source-pair review and a correction sheet for every expected SKU.</p></section>
+<figure class="film"><video id="film" controls playsinline preload="metadata" poster="./shelfproof-poster.webp" width="1920" height="1080" aria-label="ShelfProof real product demonstration"><source src="./shelfproof-demo.mp4" type="video/mp4"><track kind="captions" src="./shelfproof-demo.vtt" srclang="en" label="English"><p><a href="./shelfproof-demo.mp4">Download the ShelfProof demonstration.</a></p></video><figcaption>1 minute 33 seconds. Actual browser capture with reading pauses and source-detail close-ups. Fictional artwork with seeded price errors. All review decisions are scripted for this demonstration. English synthesized narration and burned-in subtitles; selectable English captions are also provided.</figcaption></figure>
+<nav class="chapters" aria-label="Jump to a demo chapter"><button type="button" data-time="0"><span>0:00</span>The price swap</button>
+<button type="button" data-time="15.04"><span>0:15</span>Local OCR</button>
+<button type="button" data-time="30.008"><span>0:30</span>Source evidence</button>
+<button type="button" data-time="43.464"><span>0:43</span>Scripted review</button>
+<button type="button" data-time="59.264"><span>0:59</span>The correction sheet</button>
+<button type="button" data-time="75.384"><span>1:15</span>Your next proof</button></nav>
+<section class="delivery" aria-labelledby="delivery-title"><div><h2 id="delivery-title">See the correction sheet.</h2><p>Seven SKU records with twelve original source crops. Three price differences, three matching readings and one marked missing. Open the report produced in the recording, with a sample-context note.</p><div class="actions"><a class="button" href="./sample-review.html">Open the sample review</a><a class="button secondary" href="../">Try the free checker</a></div></div><div class="service"><h2>A focused review for your next proof</h2><p class="price">US$29</p><p>Up to five pages and fifty SKUs, one correction sheet and one clarification round from Blucca’s AI-operated studio. Share a redacted page first to agree scope and a delivery date.</p><a href="../#review-service">Ask about a review</a></div></section>
+<p class="download-links"><a href="./shelfproof-demo.mp4" download>Download MP4</a><a href="./shelfproof-demo.vtt" download>English captions</a><a href="./transcript.txt">Read plain-text transcript</a></p>
+<details><summary>Read the full transcript</summary><h3>The price swap</h3><p>Two correct prices can still land beside the wrong products. In this fictional shop flyer, the notebook and pouch prices are swapped. ShelfProof checks the final artwork against an approved price list, one visible SKU at a time.</p>
+<h3>Local OCR</h3><p>Open the sample proof. This is real Tesseract OCR running locally on the rendered PDF. Six visible product codes and prices become a checklist covering all seven expected SKUs. Your files stay in the browser.</p>
+<h3>Source evidence</h3><p>The notebook&#x27;s paired OCR score is forty out of one hundred. It stays open for review. The blue SKU box and red price box show exactly which printed regions were paired, beside the original reading.</p>
+<h3>Scripted review</h3><p>Select the price area and read it again. Then confirm each pairing and printed value. This demonstration uses scripted review actions. The missing coaster gets its own explicit decision, keeping every expected SKU in the checklist.</p>
+<h3>The correction sheet</h3><p>The completed review records three price differences, three matching readings and one missing item. Download a self-contained correction sheet: seven records, twelve source crops, approved and printed amounts, plus the original OCR and reviewer decisions.</p>
+<h3>Your next proof</h3><p>Try the free local checker with your own PDF or image and approved CSV. For a focused review, the AI-operated studio offers up to five pages and fifty SKUs for twenty-nine dollars. Share one redacted page to agree the scope and date.</p></details>
+</main>
+<footer><span>Visible SKUs. One intended price per SKU. One currency per proof.</span><a href="https://github.com/blucca/shelfproof/blob/main/LICENSES.md">Licenses &amp; sources</a></footer>
+<script>
+const film = document.getElementById('film');
+for (const button of document.querySelectorAll('[data-time]')) {
+  button.addEventListener('click', () => {
+    film.currentTime = Number(button.dataset.time);
+    film.play().catch(() => film.focus());
+  });
+}
+</script>
+</body>
+</html>

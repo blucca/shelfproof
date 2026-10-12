@@ -2,6 +2,8 @@
 
 October 12, 2026. Chromium 154, with desktop and 390 px viewports.
 
+The public GitHub Pages deployment also completed this flow in a fresh anonymous browser context: real PDF OCR, price-region rereading, seven scripted decisions and the exported review. The page returned HTTP 200; page errors and failed requests both remained at zero. The [workflow video](https://blucca.github.io/shelfproof/demo/) uses that recording.
+
 ## A complete proof
 
 The [fictional Sunday Shelf artwork](sample-proof.md) is an image-only PDF. The real Tesseract LSTM model reads the rendered pixels in the browser. Six visible SKU labels and six prices were read correctly; the approved list has seven SKUs.
