@@ -1,0 +1,52 @@
+name: Check and publish ShelfProof
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shelfproof-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check price comparison and evidence pairing
+        run: npm test
+      - name: Check bundled browser assets
+        run: |
+          for path in index.html app.mjs proof-core.mjs styles.css \
+            assets/sample-promo.pdf assets/sample-prices.csv \
+            vendor/tesseract/tesseract.min.js vendor/tesseract/worker.min.js \
+            vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js \
+            vendor/tesseract/core/tesseract-core-lstm.wasm.js \
+            vendor/tesseract/lang/eng.traineddata.gz \
+            vendor/pdfjs/pdf.min.mjs vendor/pdfjs/pdf.worker.min.mjs \
+            vendor/fonts/Barlow-Regular.ttf vendor/fonts/BarlowCondensed-SemiBold.ttf; do
+            test -s "web/$path" || exit 1
+          done
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

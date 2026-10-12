@@ -4,7 +4,9 @@ Check the price on the page.
 
 ShelfProof is a local-browser price-proofing desk for small design and print studios. It reads the rendered artwork with open-source OCR, pairs visible SKUs with prices, and compares them with an approved CSV. Every expected SKU gets a review row. A correction sheet carries the source regions and the reviewer's decisions back to the client.
 
-**Status:** working local preview for [MLH × DEV's Side Hustle challenge](https://dev.to/challenges/hacktoberfest-week2-2026-10-12), October 12–18, 2026. Development began October 12 at 19:36 UTC, inside the contest window.
+**[Try ShelfProof](https://blucca.github.io/shelfproof/)** · [Release checks](docs/validation.md)
+
+Built for [MLH × DEV's Side Hustle challenge](https://dev.to/challenges/hacktoberfest-week2-2026-10-12), October 12–18, 2026. Development began October 12 at 19:36 UTC, inside the contest window.
 
 ## First release
 
@@ -26,7 +28,7 @@ Open `http://localhost:8138` and choose **Try the sample proof**. The complete r
 
 To refresh those assets: `npm ci && npm run assets`. To run the focused domain checks: `npm test`. Browser-flow checks use Playwright and an existing CDP browser; see `tests/browser-smoke.py --help`.
 
-The first browser check completed real OCR of the fictional raster PDF, source-area reselection, seven scripted reviewer decisions, and a self-contained HTML review with twelve source crops. Desktop and 390 px layouts were exercised. Validation notes and the public deployment follow with the release.
+The first browser check completed real OCR of the fictional raster PDF, source-area reselection, seven scripted reviewer decisions, and a self-contained HTML review with twelve source crops. Desktop and 390 px layouts were exercised. A separate pound-denominated PNG covered a competing-price row and preservation of the existing proof after an invalid replacement CSV. See the [release checks](docs/validation.md).
 
 ## Review flow
 
