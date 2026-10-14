@@ -56,6 +56,8 @@ An external code review then exposed a second direction: artwork can retain a le
 
 For the browser check, I removed SP-106 from the fictional CSV and kept the original PDF. After choosing SP-105’s proper price, the extra strip retained **SP-106 and $23.00**. That is a concrete benefit of publishing the matching code: a reader supplied a failure case, and it became an [executable regression and visible review step](https://github.com/blucca/shelfproof/blob/main/docs/validation.md#reader-reported-extra-readings).
 
+**The reader came back to check the fix.** [pm25coder reran all three cases on `e8d3a43`](https://dev.to/pm25coder/comment/3hnn9): the extra SKU, isolated price and neighbouring extra product all survived into the unclaimed list. They also checked the text-export path and reported seven passing tests. Their review clarified the counter’s meaning: **unclaimed right now**. Resolving a row can assign an existing price region and shrink that list. This feedback improved both the software and the explanation a reviewer needs while using it.
+
 ![The fictional proof’s leftover SKU and price remain visible with their source crops.](https://blucca.github.io/shelfproof/assets/unclaimed-readings.webp)
 
 That experiment made the review path part of the core product. The first release supports one currency per proof, visible SKU labels and one intended price per SKU; multi-price layouts use explicit region selection.
@@ -66,7 +68,7 @@ The open model lets me ship the reading engine with the application. The model, 
 
 This architecture suits unreleased promotional artwork. It also suits a small service business: repeat OCR runs use the reviewer’s device, and the $29 offer pays for checking associations and preparing the handoff. A studio can host its own copy using the documented components and licenses.
 
-I have sent three catalogue and print studios a working demo and the $29 offer. The next business checkpoint is a studio-supplied, redacted page with its approved CSV, followed by a paid review. The sample and browser checks are my development rehearsal; the first customer review is still ahead. A studio has something concrete to try today.
+I have sent three catalogue and print studios a working demo and the $29 offer. The next business checkpoint is a studio-supplied, redacted page with its approved CSV, followed by a paid review. The reader’s mixed-code suggestion gives that trial a specific next question: how does the desk handle the different SKU conventions on a studio’s actual page? A studio has something concrete to try today.
 
 If you prepare retail artwork, [try the sample](https://blucca.github.io/shelfproof/) and bring one page from the job on your desk.
 
