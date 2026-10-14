@@ -1,10 +1,12 @@
-import { parseCatalogCSV, parsePrice, formatPrice, buildReview } from './proof-core.mjs';
+import { parseCatalogCSV, parsePrice, formatPrice, buildReview, unclaimedReadings } from './proof-core.mjs';
 
 const $ = id => document.getElementById(id);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const asset = path => new URL(path, import.meta.url).href;
 const labels = { match: 'Price matches', mismatch: 'Price differs', review: 'Confirm pairing', notFound: 'Locate SKU', missing: 'Marked missing' };
+const extraKinds = { sku: 'Unlisted SKU-like label', price: 'Unclaimed price' };
 let pages = [], rows = [], selected = 0, pageIndex = 0, currency = '$', busy = false, picking = false, drag = null;
+let approved = [], unclaimed = [];
 let worker, workerPromise, progressPage = 0, progressTotal = 1, artworkName = '', catalogName = '', isSample = false;
 
 function say(text) { $('message').textContent = text; }
@@ -102,7 +104,7 @@ async function runProof(artwork, catalog, sample = false) {
       nextPages[index].words = tsvWords(data.tsv);
     }
     const nextRows = buildReview(expected, nextPages, nextCurrency).map(row => ({ ...row, reviewed: false, original: { text: row.ocrText, cents: row.ocrCents, status: row.status, confidence: row.confidence } }));
-    pages = nextPages; rows = nextRows; currency = nextCurrency; artworkName = artwork.name; catalogName = catalog.name; isSample = sample;
+    pages = nextPages; rows = nextRows; approved = expected; currency = nextCurrency; artworkName = artwork.name; catalogName = catalog.name; isSample = sample;
     $('source-caption').textContent = sample ? 'Fictional sample proof. Live OCR reads the planted errors.' : `${artworkName} with ${catalogName}`;
     $('page-picker').innerHTML = pages.map((_, i) => `<option value="${i}">${i + 1} of ${pages.length}</option>`).join('');
     $('results').hidden = false;
@@ -114,10 +116,14 @@ async function runProof(artwork, catalog, sample = false) {
 }
 function money(cents) { return Number.isSafeInteger(cents) ? formatPrice(cents, currency) : '—'; }
 function renderRows() {
+  unclaimed = unclaimedReadings(approved, pages, rows, currency);
+  $('unclaimed-readings').hidden = unclaimed.length === 0;
+  $('unclaimed-count').textContent = `${unclaimed.length} readings to check`;
+  $('unclaimed-list').innerHTML = unclaimed.map(reading => `<figure class="extra-reading"><figcaption><strong>${escape(reading.text)}</strong><span>${extraKinds[reading.kind]} · Page ${reading.pageIndex + 1}</span></figcaption><img src="${crop(pages[reading.pageIndex], reading.bbox)}" alt="Source region for ${escape(reading.text)}"><p>OCR score ${Math.round(reading.confidence)}/100 · Awaiting review</p></figure>`).join('');
   $('sku-list').innerHTML = rows.map((row, index) => `<button type="button" class="sku-row ${escape(row.status)}" data-row="${index}" aria-current="${index === selected}"><span><span class="sku-name">${escape(row.name)}</span><span class="sku-code">${escape(row.sku)}</span></span><span class="row-prices">${escape(money(row.expectedCents))} / <strong>${escape(money(row.ocrCents))}</strong></span><span class="row-state"><i class="state-dot"></i>${escape(labels[row.status])}${row.reviewed ? '<span class="confirmed-mark">Confirmed</span>' : ''}</span></button>`).join('');
   const counts = status => rows.filter(row => row.status === status).length;
   const open = counts('review') + counts('notFound');
-  $('summary').textContent = `${counts('mismatch')} price differences, ${counts('match')} matching readings${counts('missing') ? `, ${counts('missing')} marked missing` : ''}${open ? `, ${open} to resolve` : ''}`;
+  $('summary').textContent = `${counts('mismatch')} price differences, ${counts('match')} matching readings${counts('missing') ? `, ${counts('missing')} marked missing` : ''}${open ? `, ${open} to resolve` : ''}${unclaimed.length ? `, ${unclaimed.length} unclaimed readings` : ''}`;
   $('review-count').textContent = `${rows.filter(row => row.reviewed).length} of ${rows.length} SKU decisions confirmed by you.`;
 }
 function selectRow(index) {
@@ -209,7 +215,7 @@ function download(content, type, name) {
 }
 function issueText() {
   const issues = rows.filter(row => row.status !== 'match');
-  return [`ShelfProof price review${isSample ? ' — fictional sample' : ''}`, `Artwork: ${artworkName}`, `Approved list: ${catalogName}`, `Confirmed decisions: ${rows.filter(row => row.reviewed).length}/${rows.length}`, '', ...issues.map(row => `${row.sku} / ${row.name}: approved ${money(row.expectedCents)}; read ${money(row.ocrCents)}. ${labels[row.status]}. ${row.reviewed ? 'Reviewer confirmed.' : 'Awaiting reviewer confirmation.'}${Number.isInteger(row.pageIndex) && row.pageIndex >= 0 ? ` Page ${row.pageIndex + 1}.` : ''}`)].join('\n');
+  return [`ShelfProof price review${isSample ? ' — fictional sample' : ''}`, `Artwork: ${artworkName}`, `Approved list: ${catalogName}`, `Confirmed decisions: ${rows.filter(row => row.reviewed).length}/${rows.length}`, '', ...issues.map(row => `${row.sku} / ${row.name}: approved ${money(row.expectedCents)}; read ${money(row.ocrCents)}. ${labels[row.status]}. ${row.reviewed ? 'Reviewer confirmed.' : 'Awaiting reviewer confirmation.'}${Number.isInteger(row.pageIndex) && row.pageIndex >= 0 ? ` Page ${row.pageIndex + 1}.` : ''}`), '', `Unclaimed readings: ${unclaimed.length} awaiting artwork review.`, ...unclaimed.map(reading => `${extraKinds[reading.kind]}: ${reading.text}. Page ${reading.pageIndex + 1}. OCR score ${Math.round(reading.confidence)}/100.`)].join('\n');
 }
 function exportReview() {
   const confirmed = rows.filter(row => row.reviewed).length;
@@ -218,8 +224,9 @@ function exportReview() {
     const evidence = skuImage || priceImage ? `<div class="crops">${skuImage ? `<figure><figcaption>SKU region</figcaption><img alt="SKU region" src="${skuImage}"></figure>` : ''}${priceImage ? `<figure><figcaption>Price region</figcaption><img alt="Price region" src="${priceImage}"></figure>` : ''}</div>` : '';
     return `<section><h2>${escape(row.sku)} / ${escape(row.name)}</h2><p class="${escape(row.status)}"><strong>${escape(labels[row.status])}</strong> · ${row.reviewed ? 'Reviewer confirmed' : 'Awaiting reviewer confirmation'}</p><p>Approved: <strong>${escape(money(row.expectedCents))}</strong> &nbsp; Read: <strong>${escape(money(row.ocrCents))}</strong>${Number.isInteger(row.pageIndex) && row.pageIndex >= 0 ? ` &nbsp; Page ${row.pageIndex + 1}` : ''}</p><p>${escape(row.reason || '')}</p>${evidence}<p class="small">Original OCR: ${escape(row.original.text || 'SKU to locate')}. ${row.confirmedAt ? `Decision recorded: ${escape(row.confirmedAt)}.` : ''}</p></section>`;
   }).join('');
-  const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ShelfProof review</title><style>body{font:16px/1.5 Arial,sans-serif;color:#16324f;max-width:880px;margin:36px auto;padding:0 25px}h1{font-size:34px}h2{font-size:18px;margin:0 0 8px}header{border-bottom:3px solid #16324f;padding-bottom:22px;margin-bottom:25px}header p{margin:6px 0}section{border-bottom:1px solid #c4d3de;padding:18px 0;break-inside:avoid}section p{margin:6px 0}.crops{display:flex;gap:25px;flex-wrap:wrap;margin:15px 0}figure{margin:0;max-width:44%;border:1px solid #c4d3de;padding:9px}figcaption,.small{font-size:12px;color:#49667b}img{display:block;max-width:100%;height:60px;object-fit:contain;object-position:left;margin-top:8px}.mismatch,.missing{color:#b82e3a}.match{color:#24704e}.review,.notFound{color:#836018}footer{margin:30px 0;font-size:12px}@media print{body{margin:0;max-width:none}header{break-after:avoid}a{color:inherit}}</style><header><h1>ShelfProof review</h1><p>${isSample ? 'Fictional sample / seeded price errors' : 'Artwork price checklist'}</p><p>Artwork: ${escape(artworkName)}<br>Approved list: ${escape(catalogName)}<br>Currency: ${escape(currency)}</p><p>${confirmed} of ${rows.length} decisions confirmed. ${rows.length - confirmed} awaiting review.</p><p class="small">Prepared ${escape(new Date().toISOString())}. Each record separates the original OCR reading from the reviewer’s decision.</p></header>${content}<footer>Created with <a href="https://blucca.github.io/shelfproof/">ShelfProof</a>. This file contains the checklist and selected source crops. Use your browser’s Print command for a PDF copy.</footer></html>`;
-  download(html, 'text/html;charset=utf-8', 'shelfproof-review.html'); say('Review downloaded, including every SKU and its review status.');
+  const extraContent = unclaimed.length ? `<h2>Unclaimed readings</h2><p>Review these OCR regions for leftover products, secondary prices or promotional copy. Labels use the approved list’s code shapes or an explicit SKU marker.</p>${unclaimed.map(reading => `<section class="unclaimed-reading"><h2>${escape(reading.text)}</h2><p>${extraKinds[reading.kind]} · Page ${reading.pageIndex + 1} · Awaiting review</p><div class="crops"><figure><figcaption>Artwork region · OCR score ${Math.round(reading.confidence)}/100</figcaption><img alt="Source region for ${escape(reading.text)}" src="${crop(pages[reading.pageIndex], reading.bbox)}"></figure></div></section>`).join('')}` : '';
+  const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ShelfProof review</title><style>body{font:16px/1.5 Arial,sans-serif;color:#16324f;max-width:880px;margin:36px auto;padding:0 25px}h1{font-size:34px}h2{font-size:18px;margin:0 0 8px}header{border-bottom:3px solid #16324f;padding-bottom:22px;margin-bottom:25px}header p{margin:6px 0}section{border-bottom:1px solid #c4d3de;padding:18px 0;break-inside:avoid}section p{margin:6px 0}.crops{display:flex;gap:25px;flex-wrap:wrap;margin:15px 0}figure{margin:0;max-width:44%;border:1px solid #c4d3de;padding:9px}figcaption,.small{font-size:12px;color:#49667b}img{display:block;max-width:100%;height:60px;object-fit:contain;object-position:left;margin-top:8px}.mismatch,.missing{color:#b82e3a}.match{color:#24704e}.review,.notFound{color:#836018}footer{margin:30px 0;font-size:12px}@media print{body{margin:0;max-width:none}header{break-after:avoid}a{color:inherit}}</style><header><h1>ShelfProof review</h1><p>${isSample ? 'Fictional sample / seeded price errors' : 'Artwork price checklist'}</p><p>Artwork: ${escape(artworkName)}<br>Approved list: ${escape(catalogName)}<br>Currency: ${escape(currency)}</p><p>${confirmed} of ${rows.length} decisions confirmed. ${rows.length - confirmed} awaiting review.</p><p>${unclaimed.length} unclaimed artwork readings await review.</p><p class="small">Prepared ${escape(new Date().toISOString())}. Each record separates the original OCR reading from the reviewer’s decision.</p></header>${content}${extraContent}<footer>Created with <a href="https://blucca.github.io/shelfproof/">ShelfProof</a>. This file contains the checklist, unclaimed readings and source crops. Use your browser’s Print command for a PDF copy.</footer></html>`;
+  download(html, 'text/html;charset=utf-8', 'shelfproof-review.html'); say('Review downloaded, including SKU decisions and unclaimed artwork readings.');
 }
 $('proof-form').addEventListener('submit', event => { event.preventDefault(); runProof($('artwork-file').files[0], $('catalog-file').files[0]); });
 $('try-sample').addEventListener('click', async () => {
@@ -233,7 +240,7 @@ $('try-sample').addEventListener('click', async () => {
 $('use-files').addEventListener('click', () => { openDesk(); $('artwork-file').focus(); });
 $('start-over').addEventListener('click', async () => {
   if (busy) return;
-  rows = []; pages = []; setPicking(false); $('results').hidden = true; $('desk').hidden = true; $('proof-form').reset(); document.body.classList.remove('working'); $('error').hidden = true; say('');
+  rows = []; pages = []; approved = []; unclaimed = []; setPicking(false); $('results').hidden = true; $('desk').hidden = true; $('proof-form').reset(); document.body.classList.remove('working'); $('error').hidden = true; say('');
   if (worker) await worker.terminate(); worker = undefined; workerPromise = undefined;
   $('try-sample').focus(); window.scrollTo({ top: 0 });
 });

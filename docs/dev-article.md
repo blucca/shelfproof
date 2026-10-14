@@ -52,6 +52,12 @@ Word boxes feed complete-identifier matching and same-page geometric pairing. Mu
 
 A second fictional layout, this time in pounds, exposed an interesting bug. A competing price sat far along the same row, outside my original distance cutoff. Expanding the same-row candidate rule put that row into pairing review. The resulting three-row proof showed a match, a confirmation request and a price difference.
 
+An external code review then exposed a second direction: artwork can retain a leftover product beyond the approved CSV. [pm25coder reproduced three cases](https://dev.to/pm25coder/comment/3hig5), including an extra `SP-999` and a stray `$99.00`. I added **Unclaimed readings**: price regions outside the current selections and unlisted SKU-like labels, each with its source crop and page. They stay in the downloaded review and copied issue list.
+
+For the browser check, I removed SP-106 from the fictional CSV and kept the original PDF. After choosing SP-105’s proper price, the extra strip retained **SP-106 and $23.00**. That is a concrete benefit of publishing the matching code: a reader supplied a failure case, and it became an [executable regression and visible review step](https://github.com/blucca/shelfproof/blob/main/docs/validation.md#reader-reported-extra-readings).
+
+![The fictional proof’s leftover SKU and price remain visible with their source crops.](https://blucca.github.io/shelfproof/assets/unclaimed-readings.webp)
+
 That experiment made the review path part of the core product. The first release supports one currency per proof, visible SKU labels and one intended price per SKU; multi-price layouts use explicit region selection.
 
 ## Why Does Open Innovation Matter?

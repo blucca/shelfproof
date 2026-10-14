@@ -238,3 +238,50 @@ export function buildReview(catalog, pages, currency = '$') {
     return row;
   });
 }
+
+const skuShape = key => /^\d+$/.test(key) ? `digits:${key.length}` : key.replace(/[A-Z]+/g, 'A').replace(/\d+/g, '0');
+const coversReading = (box, reading) => overlap(box.x0, box.x1, reading.x0, reading.x1)
+  * overlap(box.y0, box.y1, reading.y0, reading.y1) >= (reading.x1 - reading.x0) * (reading.y1 - reading.y0) * 0.8;
+
+/** Retain artwork readings beyond the current approved-SKU selections. */
+export function unclaimedReadings(catalog, pages, rows, currency = '$') {
+  const targets = catalog.map(item => normalizeSKU(item.sku));
+  const shapes = new Set(targets.map(skuShape));
+  const extras = [];
+  pages.forEach((page, pageIndex) => {
+    const words = cleanWords(page.words), prices = priceCandidates(words, currency), claimed = new Set();
+    for (const row of rows) {
+      if (row.pageIndex !== pageIndex || !row.priceBox) continue;
+      const inside = prices.filter(price => coversReading(row.priceBox, price.bbox));
+      // A broad manual selection containing several prices keeps them in the artwork check.
+      if (inside.length === 1) claimed.add(inside[0]);
+    }
+    for (const price of prices) if (!claimed.has(price)) extras.push({ ...price, pageIndex, kind: 'price' });
+
+    const labels = [];
+    for (const first of words) {
+      const group = [];
+      let word = first;
+      // ponytail: use the catalogue's code shapes or explicit SKU labels; other copy stays on the full proof.
+      while (word && group.length < 6 && !group.some(part => part.index === word.index)) {
+        group.push(word);
+        const text = group.map(part => part.text).join(' '), key = normalizeSKU(text);
+        const explicit = /^SKU(?:\s*[:#]\s*|\s+)\S/i.test(text);
+        if (/^[A-Z0-9][A-Z0-9_/-]*$/.test(key)
+          && (explicit || (/\d/.test(key) && shapes.has(skuShape(key))))
+          && !targets.some(target => uncertainSKU(key) === uncertainSKU(target))
+          && !group.some(part => prices.some(price => coversReading(price.bbox, part.bbox)))) {
+          const label = { kind: 'sku', text, key, pageIndex, bbox: unionBox(group),
+            confidence: Math.min(...group.map(part => part.confidence)), indices: group.map(part => part.index) };
+          const existing = labels.findIndex(other => other.indices.some(index => label.indices.includes(index)));
+          if (existing === -1) labels.push(label);
+          else if ((labels[existing].key === key && label.indices.length < labels[existing].indices.length)
+            || (labels[existing].key !== key && label.indices.length > labels[existing].indices.length)) labels[existing] = label;
+        }
+        word = nextWord(word, words);
+      }
+    }
+    for (const { key, indices, ...label } of labels) extras.push(label);
+  });
+  return extras.sort((a, b) => a.pageIndex - b.pageIndex || a.bbox.y0 - b.bbox.y0 || a.bbox.x0 - b.bbox.x0);
+}

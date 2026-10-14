@@ -29,3 +29,9 @@ A cream editorial palette was discarded: this task belongs to the cool light of 
 ## Interaction contract
 
 A matched reading, a price mismatch, and an unresolved association have separate states. Every expected SKU stays visible. Clicking a row focuses its evidence region. A reviewer can select a price region and correct its transcription while retaining the original OCR reading. The exported report preserves both the machine reading and the reviewer decision.
+
+## Extra-reading review (reader feedback, October 14 UTC)
+
+Keep the proof table, Barlow type and existing six-colour palette. Put a full-width source strip directly below the artwork/checklist: “Unclaimed readings”, a count, then each OCR crop with its reading, kind and page. A blue rule ties this secondary check to the source-selection language; red remains reserved for established price differences. On phones the strip stacks into a single column. The same crops travel in the exported review.
+
+Review: the new strip serves a specific print-production error: a leftover product or secondary price outside the current SKU selections. Source pixels remain the visual focus. The existing pairing desk and comparison rules stay in place.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCatalogCSV, parsePrice, formatPrice, priceCandidates, buildReview } from '../web/proof-core.mjs';
+import { parseCatalogCSV, parsePrice, formatPrice, priceCandidates, buildReview, unclaimedReadings } from '../web/proof-core.mjs';
 
 const word = (text, x, y, width = 90, confidence = 96) => ({
   text, confidence, bbox: { x0: x, y0: y, x1: x + width, y1: y + 24 }, lineId: `line-${y}`,
@@ -98,4 +98,33 @@ test('two prices across a wide single-SKU row stay in manual review', () => {
   assert.equal(row.status, 'review');
   assert.equal(row.candidates.length, 2);
   assert.equal(row.ocrCents, null);
+});
+
+test('extra labels and prices survive the review and follow current region selections', () => {
+  const catalog = parseCatalogCSV('sku,name,price\nSP-106,Task Light,32.00');
+  const base = [word('SP-106', 780, 1400), word('$23.00', 1180, 1400)];
+  const baseline = buildReview(catalog, [page(base)]);
+  assert.deepEqual(unclaimedReadings(catalog, [page(base)], baseline), []);
+  const check = extra => {
+    const pages = [page([...base, ...extra])], rows = buildReview(catalog, pages);
+    return { pages, rows, extras: unclaimedReadings(catalog, pages, rows) };
+  };
+  const label = check([word('SP-999', 100, 100)]);
+  assert.deepEqual(label.rows, baseline);
+  assert.deepEqual(label.extras.map(x => [x.kind, x.text]), [['sku', 'SP-999']]);
+  const distant = check([word('$99.00', 100, 100)]);
+  assert.deepEqual(distant.rows, baseline);
+  assert.deepEqual(distant.extras.map(x => [x.kind, x.cents]), [['price', 9900]]);
+  const nearby = check([word('SP-999', 780, 1470), word('$99.00', 1180, 1470)]);
+  assert.equal(nearby.rows[0].status, 'review');
+  assert.deepEqual(nearby.extras.map(x => [x.kind, x.text]), [['price', '$23.00'], ['sku', 'SP-999'], ['price', '$99.00']]);
+  nearby.rows[0].priceBox = nearby.rows[0].candidates[0].bbox;
+  assert.deepEqual(unclaimedReadings(catalog, nearby.pages, nearby.rows).map(x => x.text), ['SP-999', '$99.00']);
+  nearby.rows[0].priceBox = { x0: 1170, y0: 1390, x1: 1280, y1: 1500 };
+  assert.equal(unclaimedReadings(catalog, nearby.pages, nearby.rows).filter(x => x.kind === 'price').length, 2);
+  const split = check([word('SKU:', 100, 100, 36), word('SP', 144, 100, 28), word('—', 180, 100, 12), word('999', 200, 100, 40)]);
+  assert.equal(split.extras.length, 1);
+  assert.equal(split.extras[0].text, 'SP — 999');
+  const twoPages = [page(base), page([word('$23.00', 1180, 1400)])];
+  assert.deepEqual(unclaimedReadings(catalog, twoPages, buildReview(catalog, twoPages)).map(x => x.pageIndex), [1]);
 });
