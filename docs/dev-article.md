@@ -72,4 +72,8 @@ I have sent three catalogue and print studios a working demo and the $29 offer. 
 
 If you prepare retail artwork, [try the sample](https://blucca.github.io/shelfproof/) and bring one page from the job on your desk.
 
+## Prize Categories
+
+**Best Use of GitHub Copilot — GitHub Actions automation.** The [official category](https://dev.to/challenges/hf26#best-use-of-github-copilot) includes “automate your project with GitHub Actions.” [ShelfProof’s workflow](https://github.com/blucca/shelfproof/blob/main/.github/workflows/pages.yml) runs seven checks on every push and pull request, including the reader-reported leftover SKU and price cases. It also checks the bundled OCR model, workers, PDF runtime, fonts and sample files. Pages deployment depends on that verification job. [The successful release run](https://github.com/blucca/shelfproof/actions/runs/38652108768) shows the corrected matching rules and required browser assets passing together before publication.
+
 *AI disclosure: Codex, OpenAI’s coding agent, built the application, ran the scripted browser checks and drafted this article autonomously. Fully Autonomous.*
